@@ -1,8 +1,9 @@
-import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import Navbar from "../components/Navbar";
+import { auth } from "../firebase/firebase.js";
 
-function Login() {
+function Register() {
   const navbarProps = {
     brandName: "Index",
     links: [
@@ -15,84 +16,49 @@ function Login() {
     ],
   };
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    checkboxValue: false,
-  });
-
-  const handleChange = (fieldId, value) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [fieldId]: value,
-    }));
-  };
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const { name, email, password, checkboxValue } = formData;
-
     // Validar campos obligatorios
-    if (!name || !email || !password) {
+    if (!email || !password) {
       alert("Campos obligatorios");
       console.error("Error: Campos obligatorios vacíos");
     } else {
-      console.log("Formulario enviado:", formData);
+      console.log(`Formulario enviado: Email ${email}, password: ${password}`);
       // Lógica para manejar el envío del formulario
-      const auth = getAuth();
       try {
-        // Crear el usuario con el correo y la contraseña
+        // Utiliza la instancia de autenticación `auth` para crear un usuario con correo y contraseña
         const userCredential = await createUserWithEmailAndPassword(
           auth,
           email,
           password
         );
+
+        // Obtén el usuario creado
         const user = userCredential.user;
+
+        // Accede al token de acceso desde stsTokenManager
+        const accessToken = user?.stsTokenManager?.accessToken;
+
+        // Aquí puedes agregar lógica adicional después de crear el usuario
         console.log("Usuario creado:", user);
+        console.log("Token de acceso:", accessToken);
+
+        alert(`Bienvenido: ${user.email}`);
       } catch (error) {
         console.error("Error al crear el usuario: " + error.message);
+        // Puedes agregar lógica para manejar el error, por ejemplo, mostrar un mensaje al usuario
       }
     }
   };
 
-  const fields = [
-    {
-      type: "text",
-      label: "Nombre:",
-      id: "name",
-      placeholder: "Ingrese tu nombre: ",
-      value: formData.name,
-      onChange: (e) => handleChange("name", e.target.value),
-    },
-    {
-      type: "email",
-      label: "Correo:",
-      id: "email",
-      placeholder: "Ingrese tu correo: ",
-      value: formData.email,
-      onChange: (e) => handleChange("email", e.target.value),
-    },
-    {
-      type: "password",
-      label: "Contraseña:",
-      id: "password",
-      placeholder: "Ingrese tu contraseña: ",
-      value: formData.password,
-      onChange: (e) => handleChange("password", e.target.value),
-    },
-    /*{
-      type: 'checkbox',
-      label: 'Checkbox:',
-      id: 'checkboxValue',
-      checked: formData.checkboxValue,
-      onChange: (e) => handleChange('checkboxValue', e.target.checked),
-    },*/
-  ];
-
   return (
     <>
+      {/* Navbar */}
       <Navbar {...navbarProps} />
+      {/* Card with form */}
       <div className="container d-flex align-items-center justify-content-center vh-100">
         <div className="card">
           <div className="card-body">
@@ -106,10 +72,9 @@ function Login() {
                   className="form-control"
                   id="exampleInputEmail1"
                   aria-describedby="emailHelp"
+                  name="email"
+                  onChange={(e) => setEmail(e.target.value)}
                 />
-                <div id="emailHelp" className="form-text">
-                  We'll never share your email with anyone else.
-                </div>
               </div>
               <div className="mb-3">
                 <label htmlFor="exampleInputPassword1" className="form-label">
@@ -119,6 +84,7 @@ function Login() {
                   type="password"
                   className="form-control"
                   id="exampleInputPassword1"
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
               <div className="mb-3 form-check">
@@ -126,21 +92,23 @@ function Login() {
                   type="checkbox"
                   className="form-check-input"
                   id="exampleCheck1"
+                  name="password"
                 />
-                {/* <label className="form-check-label" htmlFor="exampleCheck1">
-                  Check me out
-                </label> */}
               </div>
               <div className="row">
                 <div className="col">
-                  <a href="/register" className="btn btn-primary w-100">
-                    Registrate
-                  </a>
+                  <button
+                    type="submit"
+                    className="btn btn-secondary w-100"
+                    onClick={handleSubmit}
+                  >
+                    Registrarse
+                  </button>
                 </div>
                 <div className="col">
-                  <button type="submit" className="btn btn-secondary w-100">
-                    Login
-                  </button>
+                  <a href="/login" className="btn btn-primary w-100">
+                    Ingresar
+                  </a>
                 </div>
               </div>
             </form>
@@ -151,4 +119,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Register;

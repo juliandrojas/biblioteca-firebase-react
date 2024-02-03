@@ -57,7 +57,7 @@ const DynamicForm = ({ fields, onSubmit, buttonLabel }) => (
           return null;
       }
     })}
-
+    <button type="submit">Ingresar</button>
     <CustomButton type="submit" className='btn btn-primary w-100' disabled={true}>
       {buttonLabel || "Enviar"} {/* Puedes personalizar la etiqueta del botón o dejarla por defecto como "Enviar" */}
     </CustomButton>
