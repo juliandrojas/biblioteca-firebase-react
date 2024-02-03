@@ -1,7 +1,8 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { addDoc, collection } from 'firebase/firestore';
 import React, { useState } from "react";
 import Navbar from "../components/Navbar";
-import { auth } from "../firebase/firebase.js";
+import { auth, db } from "../firebase/firebase.js";
 
 function Register() {
   const navbarProps = {
@@ -16,17 +17,20 @@ function Register() {
     ],
   };
 
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     // Validar campos obligatorios
-    if (!email || !password) {
+    if (!name || !email || !password) {
       alert("Campos obligatorios");
       console.error("Error: Campos obligatorios vacíos");
     } else {
-      console.log(`Formulario enviado: Email ${email}, password: ${password}`);
+      console.log(`Formulario enviado: Name: ${name} ,Email ${email}, password: ${password}`);
+
       // Lógica para manejar el envío del formulario
       try {
         // Utiliza la instancia de autenticación `auth` para crear un usuario con correo y contraseña
@@ -41,15 +45,35 @@ function Register() {
 
         // Accede al token de acceso desde stsTokenManager
         const accessToken = user?.stsTokenManager?.accessToken;
-
         // Aquí puedes agregar lógica adicional después de crear el usuario
         console.log("Usuario creado:", user);
         console.log("Token de acceso:", accessToken);
-
         alert(`Bienvenido: ${user.email}`);
+        try {
+          //Agregamos datos a Firestore
+        const usuariosCollection = collection(db, 'usuarios');
+        await addDoc(usuariosCollection, {
+          uid: user.uid,
+          name,
+          email,
+          password,
+        });
+        console.log("Usuarios y datos almacenados en Firestore");
+        } catch (error) {
+          console.error('Error al amacenar datos en Firestore: '+error);
+        }
       } catch (error) {
         console.error("Error al crear el usuario: " + error.message);
-        // Puedes agregar lógica para manejar el error, por ejemplo, mostrar un mensaje al usuario
+
+        // Verifica si el error es debido a que el correo electrónico ya está en uso
+        if (error.code === "auth/email-already-in-use") {
+          alert(
+            "El correo electrónico ya está registrado. Por favor, inicia sesión."
+          );
+        } else {
+          // Puedes agregar lógica para manejar otros errores
+          alert("Error al crear el usuario. Por favor, inténtalo de nuevo.");
+        }
       }
     }
   };
@@ -64,6 +88,20 @@ function Register() {
           <div className="card-body">
             <form>
               <div className="mb-3">
+                <label htmlFor="exampleInputName1" className="form-label">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="exampleInputName1"
+                  aria-describedby="nameHelp"
+                  name="username"
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-3">
                 <label htmlFor="exampleInputEmail1" className="form-label">
                   Email address
                 </label>
@@ -74,6 +112,7 @@ function Register() {
                   aria-describedby="emailHelp"
                   name="email"
                   onChange={(e) => setEmail(e.target.value)}
+                  required
                 />
               </div>
               <div className="mb-3">
@@ -85,6 +124,7 @@ function Register() {
                   className="form-control"
                   id="exampleInputPassword1"
                   onChange={(e) => setPassword(e.target.value)}
+                  required
                 />
               </div>
               <div className="mb-3 form-check">
