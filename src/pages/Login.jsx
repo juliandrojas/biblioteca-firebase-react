@@ -1,6 +1,8 @@
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import React, { useState } from "react";
 import Navbar from "../components/Navbar";
+import { db } from "../firebase/firebase";
 
 function Login() {
   const navbarProps = {
@@ -38,6 +40,17 @@ function Login() {
         );
         const user = userCredential.user;
         console.log("Usuario autenticado:", user);
+        //Consultamos la base de datos para rescatar el nombre de usuario
+        const userDocRef = collection(db, "users");
+        const q = query(userDocRef, where("uid", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.docs.length > 0) {
+          //El usuario fue encontrado en firestore
+          const userData = querySnapshot.docs[0].data();
+          console.log("Datos del usuario: ", userData);
+        } else {
+          console.error("usuario no encontrado en Firestore");
+        }
       } catch (error) {
         console.error("Error al autenticar el usuario: " + error.message);
       }
