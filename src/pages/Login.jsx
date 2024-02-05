@@ -38,27 +38,32 @@ function Login() {
           email,
           password
         );
+        
         const user = userCredential.user;
         console.log("Usuario autenticado:", user);
-        //Consultamos la base de datos para rescatar el nombre de usuario
+      
+        // Consultamos la base de datos para rescatar el nombre de usuario
         const userDocRef = collection(db, "users");
         const q = query(userDocRef, where("uid", "==", user.uid));
         const querySnapshot = await getDocs(q);
+      
         if (querySnapshot.docs.length > 0) {
-          //El usuario fue encontrado en firestore
+          // El usuario fue encontrado en Firestore
           const userData = querySnapshot.docs[0].data();
           console.log("Datos del usuario: ", userData);
         } else {
-          console.error("usuario no encontrado en Firestore");
+          console.error("Usuario no encontrado en Firestore");
         }
       } catch (error) {
         console.error("Error al autenticar el usuario: " + error.message);
       }
+      
     }
   };
 
   return (
     <>
+    
       <Navbar {...navbarProps} />
       <div className="container d-flex align-items-center justify-content-center vh-100">
         <div className="card">
