@@ -5,18 +5,19 @@ import Navbar from "../components/Navbar";
 import { db } from "../firebase/firebase";
 
 function Login() {
+  const staticLinks = [
+    { label: "Inicio", href: "/", active: true },
+    { label: "Productos", href: "#" },
+    { label: "Ofertas", href: "#" },
+    { label: "Contacto", href: "#" },
+    { label: "Ingresar", href: "/login" },
+    { label: "Disabled", disabled: true },
+  ];
+
   const navbarProps = {
     brandName: "Index",
-    links: [
-      { label: "Inicio", href: "/", active: true },
-      { label: "Productos", href: "#" },
-      { label: "Ofertas", href: "#" },
-      { label: "Contacto", href: "#" },
-      { label: "Ingresar", href: "/login" },
-      { label: "Disabled", disabled: true },
-    ],
+    links: staticLinks,
   };
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -38,15 +39,15 @@ function Login() {
           email,
           password
         );
-        
+
         const user = userCredential.user;
         console.log("Usuario autenticado:", user);
-      
+
         // Consultamos la base de datos para rescatar el nombre de usuario
         const userDocRef = collection(db, "users");
         const q = query(userDocRef, where("uid", "==", user.uid));
         const querySnapshot = await getDocs(q);
-      
+
         if (querySnapshot.docs.length > 0) {
           // El usuario fue encontrado en Firestore
           const userData = querySnapshot.docs[0].data();
@@ -57,13 +58,11 @@ function Login() {
       } catch (error) {
         console.error("Error al autenticar el usuario: " + error.message);
       }
-      
     }
   };
 
   return (
     <>
-    
       <Navbar {...navbarProps} />
       <div className="container d-flex align-items-center justify-content-center vh-100">
         <div className="card">
