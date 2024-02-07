@@ -1,6 +1,7 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { addDoc, collection } from 'firebase/firestore';
 import React, { useState } from "react";
+import { Link } from 'react-router-dom';
 import Navbar from "../components/Navbar";
 import { auth, db } from "../firebase/firebase.js";
 
@@ -146,9 +147,10 @@ function Register() {
                   </button>
                 </div>
                 <div className="col">
-                  <a href="/login" className="btn btn-primary w-100">
+                <Link to={'/login'} className="btn btn-primary w100">Ingresar</Link>
+                  {/* <a href="/login" className="btn btn-primary w-100">
                     Ingresar
-                  </a>
+                  </a> */}
                 </div>
               </div>
             </form>

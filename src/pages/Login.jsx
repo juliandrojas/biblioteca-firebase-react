@@ -1,6 +1,7 @@
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import React, { useState } from "react";
+import { Link } from 'react-router-dom';
 import Navbar from "../components/Navbar";
 import { db } from "../firebase/firebase";
 
@@ -104,9 +105,10 @@ function Login() {
               </div>
               <div className="row">
                 <div className="col">
-                  <a href="/register" className="btn btn-primary w-100">
+                <Link to={'/register'} className="btn btn-primary w-100">Registrarse</Link>
+                  {/* <a href="/register" className="btn btn-primary w-100">
                     Registrate
-                  </a>
+                  </a> */}
                 </div>
                 <div className="col">
                   <button
