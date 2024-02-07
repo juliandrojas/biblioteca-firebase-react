@@ -6,7 +6,7 @@ function Index() {
     brandName: 'Index',
     links: [
       { label: 'Inicio', href: '/', active: true },
-      { label: 'Productos', href: '#' },
+      { label: 'Catálogo', href: '#' },
       { label: 'Ofertas', href: '#' },
       { label: 'Contacto', href: '#' },
       { label: 'Ingresar', href: '/login' },

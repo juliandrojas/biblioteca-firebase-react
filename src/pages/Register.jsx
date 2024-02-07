@@ -1,9 +1,7 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { addDoc, collection } from 'firebase/firestore';
 import React, { useState } from "react";
 import { Link } from 'react-router-dom';
 import Navbar from "../components/Navbar";
-import { auth, db } from "../firebase/firebase.js";
+import { supabase } from '../supabase/supabase';
 
 function Register() {
   const navbarProps = {
@@ -22,6 +20,17 @@ function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  //? Método para buscar un usuario por su email en Firestore
+  const searchUser = async (email) => {
+    try {
+      let { data: users, error } = supabase.from('users').select('name');
+      users ? console.log("users") : console.log('Not users');
+    } catch (error) {
+      console.error('Error al buscar un usuario en Supabase: '+error);
+      throw error; //! Re-lanzamos el error para manejarlo en el contexto en el que se llame la función
+    }
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -31,7 +40,45 @@ function Register() {
       console.error("Error: Campos obligatorios vacíos");
     } else {
       console.log(`Formulario enviado: Name: ${name} ,Email ${email}, password: ${password}`);
+      //* Lógica para manejar el envío del formulario
+      try {
+        searchUser(email).then((userData) => {
+          console.log(userData)
+        });
+      } catch (error) {
+        console.error('Error al buscar usuario en Firestore:', error);
+      }
+      
+      /*
+      try {
+        // ! Consultamos la base de datos para rescatar el correo del usuario
+        const userDocRef = collection(db, 'users');
+        const q = query(userDocRef, where('email', '==', email));
+        const querySnapshot = await getDocs(q);
+        // * Si existe un resultado
+        if(querySnapshot.docs.length > 0) {
+          // * El usuario fue encontrado en Firestore
+          const userData = querySnapshot.docs[0].data();
+          console.log(`Datos del usuario: ${userData}`);
+        } else {
+          console.error(`Usuario no encontrado en Firestore`);
+        }*/
 
+        /*
+        //! Revisamos si el  usuario ya existe en la base de datos
+        const docRef = doc(db, 'usuarios', 'juliandra140201@gmail.com');
+        const docSnap = await getDoc(docRef);
+        console.log(docSnap);
+        // * Si el usuario existe
+        if(docSnap.exists) {
+          console.log('Datos del usuario encontrado: ', docSnap.data());
+        } else {
+          console.error('No hay usuarios con este email en la base de datos');
+        }
+      } catch (error) {
+        console.error(`Error al buscar usuarios en Firestore: ${error}`);
+      }*/
+      /*
       // Lógica para manejar el envío del formulario
       try {
         // Utiliza la instancia de autenticación `auth` para crear un usuario con correo y contraseña
@@ -75,7 +122,7 @@ function Register() {
           // Puedes agregar lógica para manejar otros errores
           alert("Error al crear el usuario. Por favor, inténtalo de nuevo.");
         }
-      }
+      }*/
     }
   };
 
